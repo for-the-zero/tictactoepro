@@ -111,6 +111,6 @@ def create3():
 if __name__ == '__main__':
 	#print(create3())
 	formatted_str = '\n'.join(str(item) for item in create2())
-	filename = 'output.txt'
+	filename = 'pgstxt.txt'
 	with open(filename, 'w') as file:
 		file.write(formatted_str)
