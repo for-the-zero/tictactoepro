@@ -34,7 +34,7 @@ def get_data_num(filename,tablename,condition):
 		q += f"`{key}` = '{value}' AND "
 	q = q[:-5]
 	q += ';'
-	print(q)
+	#print(q)
 	# execute the query
 	c.execute(q)
 	# get the result
