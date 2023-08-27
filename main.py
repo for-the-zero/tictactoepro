@@ -6,10 +6,8 @@
 #
 # BUG:
 #
-# 点击下棋后棋盘未更新甚至未运算
-# 即时棋盘更新，robot也没有下棋
+# robot重复执行
 #
-# 注：streamlit run main.py 启动
 
 
 
@@ -33,16 +31,22 @@ def stvar_w(name,value):
 #################################
 
 def pgtomd(ipg):
-	global pg
+	
+	#print(ipg)
+	#global pg
+	'''
 	for i in range(len(ipg)):
 		if ipg[i] == 'N':
 			ipg[i] = ''
-	pg = f"""
+	'''
+
+	st.session_state['pg']=f"""
 	|.{ipg[0]}.|.{ipg[1]}.|.{ipg[2]}.|
 	|:--:|:--:|:--:|
 	|.{ipg[3]}.|.{ipg[4]}.|.{ipg[5]}.|
 	|.{ipg[6]}.|.{ipg[7]}.|.{ipg[8]}.|
 	"""
+	st.session_state['pg'] = st.session_state['pg'].replace('N','')
 
 
 #################################
@@ -62,8 +66,6 @@ if 'ipg' not in st.session_state:
 ################################
 
 
-# mode 1我方概率大 2对方概率小 3我方可行性多 4对方可行性少
-# 其它模式还没做
 def robot(nowpg):
 	mode = stvar_r('mode')
 	allpg = tc.fillN(nowpg,stvar_r('robotis'))
@@ -86,6 +88,8 @@ def robot(nowpg):
 		#print(r_ways,t_ways,p_ways)
 		nbs.append([r_ways,t_ways,p_ways])
 
+
+# mode 1我方概率大 2对方概率小 3我方可行性多 4对方可行性少
 	if mode == 1:
 		tmpcprlst = []
 		if rd.randint(0,1) == 0:
@@ -98,7 +102,16 @@ def robot(nowpg):
 			stvar_w('ipg',allpg[tmpcprlst.index(max(tmpcprlst))])
 
 	elif mode == 2:
-		...
+		tmpcprlst = []
+		if rd.randint(0,1) == 0:
+			for i in range(len(nbs)):
+				tmpcprlst.append(nbs[i][2])
+			stvar_w('ipg',allpg[tmpcprlst.index(min(tmpcprlst))])
+		else:
+			for i in range(len(nbs)):
+				tmpcprlst.append(nbs[i][2] + nbs[i][1])
+			stvar_w('ipg',allpg[tmpcprlst.index(min(tmpcprlst))])
+
 	elif mode == 3:
 		...
 	elif mode == 4:
@@ -113,19 +126,27 @@ def robot(nowpg):
 
 
 def afterplayer(nextstepplayer):
+	#print('debug-2')
 	global isthatover
 	global whoover
 	tmp = stvar_r('ipg')[:]
+	
+	#print(tmp,tmp[nextstepplayer],tmp[nextstepplayer] == 'N')
 	if tmp[nextstepplayer] == 'N':
+		#print('debug-1')
 		tmp[nextstepplayer] = stvar_r('playeris')
 		stvar_w('ipg', tmp)
+		#print(stvar_r('ipg'))
 		game_status = tc.isover(tmp)
+		#print('game_status1',game_status)
 		if game_status is None:
+			#print('debug-2')
 			robot(stvar_r('ipg'))
 			tmp = stvar_r('ipg')
 			game_status = tc.isover(tmp)
+			#print('game_status2',game_status)
 			if game_status is None:
-				robot(stvar_r('ipg'))
+				pass
 			else:
 				isthatover = True
 				if game_status == 'T':
@@ -138,7 +159,9 @@ def afterplayer(nextstepplayer):
 				whoover = '平!'
 			else:
 				whoover = game_status + '胜!'
+	#print(stvar_r('ipg'))
 	pgtomd(stvar_r('ipg'))
+	#print('debug-3')
 
 
 
@@ -155,6 +178,7 @@ with rst1:
 with rst2:
 	if st.button('X', disabled=False):
 		stvar_w('ipg',['N','N','N','N','N','N','N','N','N'])
+		#print(stvar_r('ipg'))
 		stvar_w('robotis','O')
 		stvar_w('playeris','X')
 		pgtomd(stvar_r('ipg'))
@@ -178,7 +202,10 @@ whoover = 0
 with st.form("go"):
 	nextstepplayer = st.slider("位置：", 0, 8, 0, 1)
 	if st.form_submit_button("下棋"):
+		#print('debug-1')
 		afterplayer(nextstepplayer)
+		pg = st.session_state['pg']
+		#print(pg)
 		st.markdown(pg)
 		st.markdown('---')
 		if isthatover:
