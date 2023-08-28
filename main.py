@@ -94,14 +94,35 @@ def robot(nowpg):
 		tmpcprlst = []
 		if rd.randint(0,1) == 0:
 			for i in range(len(nbs)):
+				tmpcprlst.append(nbs[i][0] / (nbs[i][0] + nbs[i][1] + nbs[i][2]))
+			stvar_w('ipg',allpg[tmpcprlst.index(max(tmpcprlst))])
+		else:
+			for i in range(len(nbs)):
+				tmpcprlst.append((nbs[i][0] + nbs[i][1]) / (nbs[i][0] + nbs[i][1] + nbs[i][2]))
+			stvar_w('ipg',allpg[tmpcprlst.index(max(tmpcprlst))])
+
+	elif mode == 2:
+		tmpcprlst = []
+		if rd.randint(0,1) == 0:
+			for i in range(len(nbs)):
+				tmpcprlst.append(nbs[i][2] / (nbs[i][0] + nbs[i][1] + nbs[i][2]))
+			stvar_w('ipg',allpg[tmpcprlst.index(min(tmpcprlst))])
+		else:
+			for i in range(len(nbs)):
+				tmpcprlst.append((nbs[i][2] + nbs[i][1]) / (nbs[i][0] + nbs[i][1] + nbs[i][2]))
+			stvar_w('ipg',allpg[tmpcprlst.index(min(tmpcprlst))])
+
+	elif mode == 3:
+		tmpcprlst = []
+		if rd.randint(0,1) == 0:
+			for i in range(len(nbs)):
 				tmpcprlst.append(nbs[i][0])
 			stvar_w('ipg',allpg[tmpcprlst.index(max(tmpcprlst))])
 		else:
 			for i in range(len(nbs)):
 				tmpcprlst.append(nbs[i][0] + nbs[i][1])
 			stvar_w('ipg',allpg[tmpcprlst.index(max(tmpcprlst))])
-
-	elif mode == 2:
+	elif mode == 4:
 		tmpcprlst = []
 		if rd.randint(0,1) == 0:
 			for i in range(len(nbs)):
@@ -111,11 +132,6 @@ def robot(nowpg):
 			for i in range(len(nbs)):
 				tmpcprlst.append(nbs[i][2] + nbs[i][1])
 			stvar_w('ipg',allpg[tmpcprlst.index(min(tmpcprlst))])
-
-	elif mode == 3:
-		...
-	elif mode == 4:
-		...
 	else:
 		print('???')
 
@@ -204,10 +220,11 @@ with st.form("go"):
 	if st.form_submit_button("下棋"):
 		#print('debug-1')
 		afterplayer(nextstepplayer)
-		pg = st.session_state['pg']
 		#print(pg)
-		st.markdown(pg)
-		st.markdown('---')
 		if isthatover:
 			stvar_w('ipg',['N','N','N','N','N','N','N','N','N'])
 			st.markdown('# **' + whoover + '**')
+	pg = st.session_state['pg']
+	st.markdown(pg)
+	st.markdown('---')
+
